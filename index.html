@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="kr">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <title>Markdown CMS</title>
+    <!-- Bootstrap core CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+    <!-- Custom styles for this template -->
+    <link href="https://getbootstrap.com/docs/4.1/examples/dashboard/dashboard.css" rel="stylesheet">
+  </head>
+
+  <body>
+    <nav class="navbar navbar-dark fixed-top bg-dark flex-md-nowrap p-0 shadow">
+      <a class="navbar-brand col-sm-3 col-md-2 mr-0" href="#">타이틀</a>
+    </nav>
+
+    <div class="container-fluid">
+      <div class="row">
+        <nav class="col-md-2 d-none d-md-block bg-light sidebar">
+          <div class="sidebar-sticky pt-2 navigation"></div>
+        </nav>
+
+        <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-4">
+            <div class="row">
+                <div class="col-md-9 main-content"></div>
+            </div>
+        </main>
+      </div>
+    </div>
+
+    <!-- Bootstrap core JavaScript -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/showdown/1.8.6/showdown.min.js" integrity="sha256-dwhppIrxD8qC6lNulndZgtIm4XBU9zoMd9OUoXzIDAE=" crossorigin="anonymous"></script>
+    <script type="text/javascript">
+    var navClassMap = new Map([
+        ['a', 'nav-link'],
+        ['h6', 'px-3']
+    ]);
+    var contentClassMap = new Map([
+        ['h1', 'h2 py-3 mb-3 border-bottom'],
+        ['table', 'table table-striped table-bordered'],
+        ['pre', 'alert alert-secondary']
+    ]);
+
+    $(function() {
+        var converter = new showdown.Converter({
+            tables: true
+        });
+        function load(url, fn) {
+            $.get(url+'?'+(new Date()).getTime(), function(md) {
+                fn(md);
+            });
+        };
+
+        function addClass(html, map) {
+            map.forEach(function(value, key) {
+                html = html.replace(new RegExp(`<${key}(.*)>`, 'g'), `<${key} class="${value}" $1>`);
+            });
+            return html;
+        }
+
+        load('md/nav.md', function(md) {
+            var html = converter.makeHtml(md);
+            console.log(html);
+            html = html.replace(/<[/]?p>/g, '');
+            html = addClass(html, navClassMap);
+            console.log(html);
+            $('.navigation').html(html);
+            $('.navigation a.nav-link:first').click();
+        });
+
+        $('.navigation').on('click', '.nav-link', function() {
+            $('.navigation a.nav-link').removeClass('active');
+            $(this).addClass('active');
+            load($(this).attr('href'), function(md) {
+                var html = converter.makeHtml(md);
+                html = addClass(html, contentClassMap);
+                $('.main-content').html(html);
+                window.scrollTo(0, 0);
+            });
+
+            return false;
+        });
+    });
+    </script>
+  </body>
+</html>
